@@ -1,0 +1,64 @@
+class Lazy {
+  int seg[];
+  int lazy[];
+  
+  Lazy(int n){
+      seg = new int[4*n];
+      lazy = new int[4*n];
+  }
+  
+  void build(int ind, int low, int high, int[] arr){
+      
+      if(low == high){
+          seg[ind] = arr[low];
+          return;
+      }
+      
+      int mid = low + (high-low)/2;
+      
+      build(2*ind+1, low, mid, arr);
+      build(2*ind+2, mid+1, high, arr);
+      
+      seg[ind] = seg[2*ind+1] + seg[2*ind+2];
+  }
+  
+  void update(int ind, int low, int high, int l, int r, int val){
+      
+      if(lazy[ind]!=0){
+          seg[ind] += (high - low + 1) * lazy[ind];
+          
+          if(low!=high){
+              lazy[2*ind+1] += lazy[ind];
+              lazy[2*ind+2] += lazy[ind];
+          }
+          
+          lazy[ind] = 0;
+      }
+      
+      //no overlap 
+      // l r low high or low high l r 
+      if(r<low || high< l){
+          return;
+      }
+      
+      //complete overlap
+      // l low high r 
+      if(l<=low && high<=r){
+          seg[ind] += (high-low+1) * val;
+          
+          if(low!=high){
+              lazy[2*ind+1] += val;
+              lazy[2*ind+2] += val;
+          }
+          
+          return;
+      }
+      
+      int mid = low + (high-low)/2;
+      update(2*ind+1, low, mid, l, r, arr);
+      update(2*ind+2, mid+1, high, l, r, arr);
+      
+      seg[ind] = seg[2*ind+1] + seg[2*ind+2];
+  }
+    
+}
